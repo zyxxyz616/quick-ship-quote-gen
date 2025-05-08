@@ -1,13 +1,19 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import Layout from "@/components/Layout";
+import ShipmentCalculator from "@/components/shipping/ShipmentCalculator";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <Layout>
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-shipping-navy mb-2">Intelligent Rate Calculator</h2>
+        <p className="text-shipping-navy/80">
+          Welcome back. Get instant carrier quotes with your negotiated rates in 3 simple steps.
+        </p>
       </div>
-    </div>
+      
+      <ShipmentCalculator />
+    </Layout>
   );
 };
 
