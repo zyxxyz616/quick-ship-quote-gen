@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -28,19 +27,20 @@ const shippingFormSchema = z.object({
   state: z.string().length(2, "State must be a 2-letter code"),
   zip: z.string().regex(/^\d{5}(-\d{4})?$/, "Invalid ZIP code format")
 });
-
 type ShippingFormValues = z.infer<typeof shippingFormSchema>;
-
 const CustomerShippingForm = () => {
-  const { userEmail } = useAuth();
-  const { toast } = useToast();
+  const {
+    userEmail
+  } = useAuth();
+  const {
+    toast
+  } = useToast();
   const [rates, setRates] = useState<CarrierRate[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResults, setShowResults] = useState(false);
 
   // Get the customer-specific markup from mock data
   const customerMarkup = getCustomerMarkup(userEmail || "");
-
   const form = useForm<ShippingFormValues>({
     resolver: zodResolver(shippingFormSchema),
     defaultValues: {
@@ -56,34 +56,24 @@ const CustomerShippingForm = () => {
       zip: ""
     }
   });
-
   const onSubmit = (data: ShippingFormValues) => {
     setIsSubmitting(true);
-    
+
     // Calculate dimensional weight
     const dimensions: Dimensions = {
       length: data.length,
       width: data.width,
       height: data.height
     };
-    
     const dimWeight = calculateDimWeight(dimensions);
-    
+
     // Generate mock shipping rates
     setTimeout(() => {
       try {
-        const generatedRates = generateMockRates(
-          data.originWarehouse,
-          data.zip,
-          data.weight,
-          dimWeight,
-          customerMarkup
-        );
-        
+        const generatedRates = generateMockRates(data.originWarehouse, data.zip, data.weight, dimWeight, customerMarkup);
         setRates(generatedRates);
         setShowResults(true);
         setIsSubmitting(false);
-        
         toast({
           title: "Shipping rates calculated",
           description: `Found ${generatedRates.length} shipping options for your package`
@@ -98,9 +88,7 @@ const CustomerShippingForm = () => {
       }
     }, 1000);
   };
-
-  return (
-    <div>
+  return <div>
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="text-xl text-shipping-navy">Shipping Rate Calculator</CardTitle>
@@ -116,78 +104,57 @@ const CustomerShippingForm = () => {
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold">Package Dimensions (inches)</h3>
                   <div className="grid grid-cols-3 gap-2">
-                    <FormField
-                      control={form.control}
-                      name="length"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="length" render={({
+                    field
+                  }) => <FormItem>
                           <FormLabel className="text-xs">Length</FormLabel>
                           <FormControl>
                             <Input type="number" {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="width"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="width" render={({
+                    field
+                  }) => <FormItem>
                           <FormLabel className="text-xs">Width</FormLabel>
                           <FormControl>
                             <Input type="number" {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="height"
-                      render={({ field }) => (
-                        <FormItem>
+                        </FormItem>} />
+                    <FormField control={form.control} name="height" render={({
+                    field
+                  }) => <FormItem>
                           <FormLabel className="text-xs">Height</FormLabel>
                           <FormControl>
                             <Input type="number" {...field} />
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold">Package Weight</h3>
-                  <FormField
-                    control={form.control}
-                    name="weight"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="weight" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Weight (lbs)</FormLabel>
                         <FormControl>
                           <Input type="number" {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                 </div>
 
                 <div className="space-y-2">
                   <h3 className="text-sm font-semibold">Shipment Details</h3>
                   <div className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="originWarehouse"
-                      render={({ field }) => (
-                        <FormItem>
+                    <FormField control={form.control} name="originWarehouse" render={({
+                    field
+                  }) => <FormItem>
                           <FormLabel>Origin Warehouse</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select origin warehouse" />
@@ -199,22 +166,14 @@ const CustomerShippingForm = () => {
                             </SelectContent>
                           </Select>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
 
-                    <FormField
-                      control={form.control}
-                      name="destinationType"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2">
+                    <FormField control={form.control} name="destinationType" render={({
+                    field
+                  }) => <FormItem className="space-y-2">
                           <FormLabel>Destination Type</FormLabel>
                           <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              className="flex space-x-4"
-                            >
+                            <RadioGroup onValueChange={field.onChange} defaultValue={field.value} className="flex space-x-4">
                               <FormItem className="flex items-center space-x-2">
                                 <FormControl>
                                   <RadioGroupItem value="Residential" />
@@ -234,9 +193,7 @@ const CustomerShippingForm = () => {
                             </RadioGroup>
                           </FormControl>
                           <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                        </FormItem>} />
                   </div>
                 </div>
               </div>
@@ -244,68 +201,48 @@ const CustomerShippingForm = () => {
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold">Destination Address</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="street"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="street" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>Street Address</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
+                      </FormItem>} />
+                  <FormField control={form.control} name="city" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>City</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
+                  <FormField control={form.control} name="state" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>State</FormLabel>
                         <FormControl>
                           <Input {...field} maxLength={2} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="zip"
-                    render={({ field }) => (
-                      <FormItem>
+                      </FormItem>} />
+                  <FormField control={form.control} name="zip" render={({
+                  field
+                }) => <FormItem>
                         <FormLabel>ZIP Code</FormLabel>
                         <FormControl>
                           <Input {...field} />
                         </FormControl>
                         <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      </FormItem>} />
                 </div>
               </div>
 
-              <Button 
-                type="submit" 
-                className="w-full bg-shipping-navy" 
-                disabled={isSubmitting}
-              >
+              <Button type="submit" className="w-full bg-shipping-navy" disabled={isSubmitting}>
                 {isSubmitting ? "Calculating Rates..." : "Calculate Shipping Rates"}
               </Button>
             </form>
@@ -313,8 +250,7 @@ const CustomerShippingForm = () => {
         </CardContent>
       </Card>
 
-      {showResults && rates.length > 0 && (
-        <Card>
+      {showResults && rates.length > 0 && <Card>
           <CardHeader>
             <CardTitle className="text-xl text-shipping-navy">Shipping Options</CardTitle>
             <CardDescription>
@@ -328,25 +264,23 @@ const CustomerShippingForm = () => {
                   <tr className="bg-gray-50">
                     <th className="p-2 text-left">Carrier</th>
                     <th className="p-2 text-left">Service</th>
-                    <th className="p-2 text-left">Base Rate</th>
-                    <th className="p-2 text-left">Markup</th>
+                    
+                    
                     <th className="p-2 text-left">Total Rate</th>
                     <th className="p-2 text-left">Delivery</th>
                     <th className="p-2 text-left">Reliability</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {rates.map((rate, index) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  {rates.map((rate, index) => <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="p-2 font-medium">{rate.carrier}</td>
                       <td className="p-2">{rate.serviceLevel}</td>
-                      <td className="p-2">${rate.baseRate.toFixed(2)}</td>
-                      <td className="p-2">${rate.markupAmount.toFixed(2)}</td>
+                      
+                      
                       <td className="p-2 font-bold">${rate.totalRate.toFixed(2)}</td>
                       <td className="p-2">{rate.deliveryDays} day{rate.deliveryDays !== 1 && 's'}</td>
                       <td className="p-2">{rate.reliability}%</td>
-                    </tr>
-                  ))}
+                    </tr>)}
                 </tbody>
               </table>
             </div>
@@ -357,10 +291,7 @@ const CustomerShippingForm = () => {
             </Button>
             <Button>Select Cheapest Option</Button>
           </CardFooter>
-        </Card>
-      )}
-    </div>
-  );
+        </Card>}
+    </div>;
 };
-
 export default CustomerShippingForm;
